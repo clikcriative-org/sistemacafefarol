@@ -1,0 +1,23 @@
+services:
+  farol-cafe:
+    build: .
+    container_name: farol-cafe
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.farol.rule=Host(`pulseone.art`) || Host(`www.pulseone.art`)"
+      - "traefik.http.routers.farol.entrypoints=websecure"
+      - "traefik.http.routers.farol.tls.certresolver=letsencrypt"
+      - "traefik.http.services.farol.loadbalancer.server.port=4000"
+      - "traefik.http.routers.farol-http.rule=Host(`pulseone.art`) || Host(`www.pulseone.art`)"
+      - "traefik.http.routers.farol-http.entrypoints=web"
+      - "traefik.http.routers.farol-http.middlewares=farol-https"
+      - "traefik.http.middlewares.farol-https.redirectscheme.scheme=https"
+    networks:
+      - coolify
+    restart: unless-stopped
+networks:
+  coolify:
+    external: true
